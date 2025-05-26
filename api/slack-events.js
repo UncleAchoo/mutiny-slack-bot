@@ -1,4 +1,6 @@
 const SLACK_BOT_TOKEN = process.env.SLACK_BOT_TOKEN;
+import fetch from 'node-fetch';
+
 
 export default async function handler(req, res) {
   if (req.method !== 'POST') {
@@ -29,7 +31,15 @@ export default async function handler(req, res) {
           text: `👋 Hi <@${event.user}>! I'm here to help. Ask me anything!`
         })
       });
+
+      const data = await response.json();
+      console.log("Slack API response:", data);
+
+      if (!data.ok) {
+        console.error("❌ Failed to send message:", data.error);
+        }
     }
+
 
     return res.status(200).send('Event received');
   }
