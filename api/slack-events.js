@@ -1,3 +1,5 @@
+const SLACK_BOT_TOKEN = process.env.SLACK_BOT_TOKEN;
+
 export default async function handler(req, res) {
   if (req.method !== 'POST') {
     return res.status(405).send('Method Not Allowed');
@@ -10,10 +12,23 @@ export default async function handler(req, res) {
   }
 
   if (type === 'event_callback') {
-    console.log('Slack event:', event);
+    console.log("Slack event:", event);
 
+    // Respond to @mentions
     if (event.type === 'app_mention') {
-      console.log(`Mentioned by <@${event.user}>: ${event.text}`);
+      const channel = event.channel;
+
+      await fetch('https://slack.com/api/chat.postMessage', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json; charset=utf-8',
+          'Authorization': `Bearer ${SLACK_BOT_TOKEN}`
+        },
+        body: JSON.stringify({
+          channel,
+          text: `👋 Hi <@${event.user}>! I'm here to help. Ask me anything!`
+        })
+      });
     }
 
     return res.status(200).send('Event received');
@@ -21,4 +36,3 @@ export default async function handler(req, res) {
 
   res.status(200).send('OK');
 }
-
