@@ -2,5 +2,8 @@
   "name": "mutiny-slack-bot",
   "version": "1.0.0",
   "main": "api/slack-events.js",
-  "type": "module"
+  "type": "module",
+  "dependencies": {
+    "node-fetch": "^3.0.0"
+    }
 }
