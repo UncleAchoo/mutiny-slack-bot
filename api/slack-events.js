@@ -20,7 +20,7 @@ export default async function handler(req, res) {
     if (event.type === 'app_mention') {
       const channel = event.channel;
 
-      await fetch('https://slack.com/api/chat.postMessage', {
+      const slackResponse = await fetch('https://slack.com/api/chat.postMessage', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json; charset=utf-8',
@@ -32,7 +32,7 @@ export default async function handler(req, res) {
         })
       });
 
-      const data = await response.json();
+      const data = await slackResponse.json();
       console.log("Slack API response:", data);
 
       if (!data.ok) {
