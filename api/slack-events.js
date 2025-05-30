@@ -37,7 +37,7 @@ export default async function handler(req, res) {
         return res.status(500).send('Error fetching thread');
       }
 
-      // Step 2: Combine thread messagess into a single query string 
+      // Step 2: Combine thread messagesss into a single query string 
       const fullMessage = threadData.messages.map(m => m.text).join('\n');
 
       // Step 3: Query Zendesk Help Center
