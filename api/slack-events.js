@@ -1,7 +1,7 @@
 const SLACK_BOT_TOKEN = process.env.SLACK_BOT_TOKEN;
 const ZENDESK_EMAIL = process.env.ZENDESK_EMAIL;
 const ZENDESK_API_TOKEN = process.env.ZENDESK_API_TOKEN;
-const ZENDESK_SUBDOMAIN = "YOUR_ZENDESK_SUBDOMAIN";
+const ZENDESK_SUBDOMAIN = "YOUR_ZENDESK_SUBDOMAIN"; // <-- replace with actual subdomain
 
 import fetch from 'node-fetch';
 
@@ -19,7 +19,6 @@ export default async function handler(req, res) {
   if (type === 'event_callback') {
     console.log("Slack event:", event);
 
-    // Handle @MutinySupport mentions
     if (event.type === 'app_mention') {
       const channel = event.channel;
       const ts = event.thread_ts || event.ts;
@@ -31,14 +30,21 @@ export default async function handler(req, res) {
         }
       });
 
-      const threadData = await threadRes.json();
-      if (!threadData.ok) {
-        console.error("Failed to fetch thread:", threadData.error);
+      if (!threadRes.ok) {
+        const errorText = await threadRes.text();
+        console.error("Failed to fetch thread (raw):", errorText);
         return res.status(500).send('Error fetching thread');
       }
 
-      // Step 2: Combine thread messagesss into a single query string 
+      const threadData = await threadRes.json();
+      if (!threadData.ok) {
+        console.error("Slack API error:", threadData.error);
+        return res.status(500).send('Slack API returned error');
+      }
+
+      // Step 2: Combine thread messages into a single query string
       const fullMessage = threadData.messages.map(m => m.text).join('\n');
+      console.log("Full message for Zendesk search:", fullMessage);
 
       // Step 3: Query Zendesk Help Center
       const query = encodeURIComponent(fullMessage);
@@ -48,6 +54,12 @@ export default async function handler(req, res) {
           'Content-Type': 'application/json'
         }
       });
+
+      if (!zdResponse.ok) {
+        const errorText = await zdResponse.text();
+        console.error("Zendesk fetch failed:", errorText);
+        return res.status(500).send('Error fetching from Zendesk');
+      }
 
       const zdData = await zdResponse.json();
       const articles = zdData.results?.slice(0, 3) || [];
@@ -104,7 +116,7 @@ export default async function handler(req, res) {
 
       const data = await slackResponse.json();
       if (!data.ok) {
-        console.error("❌ Failed to send message:", data.error);
+        console.error("❌ Failed to send message to Slack:", data.error);
       }
     }
 
