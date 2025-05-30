@@ -1,7 +1,7 @@
 const SLACK_BOT_TOKEN = process.env.SLACK_BOT_TOKEN;
 const ZENDESK_EMAIL = process.env.ZENDESK_EMAIL;
 const ZENDESK_API_TOKEN = process.env.ZENDESK_API_TOKEN;
-const ZENDESK_SUBDOMAIN = "YOUR_ZENDESK_SUBDOMAIN"; // Replace this with your actual Zendesk subdomain
+const ZENDESK_SUBDOMAIN = "mutiny"; // Replace this with your actual Zendesk subdomain
 
 import fetch from 'node-fetch';
 
