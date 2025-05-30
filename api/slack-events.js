@@ -27,11 +27,17 @@ export default async function handler(req, res) {
       // Step 1: Fetch full message thread
       const threadRes = await fetch(`https://slack.com/api/conversations.replies?channel=${channel}&ts=${ts}`, {
         headers: {
-          'Authorization': `Bearer ${SLACK_BOT_TOKEN}`
+            'Authorization': `Bearer ${SLACK_BOT_TOKEN}`
         }
-      });
+        });
 
-      const threadData = await threadRes.json();
+        if (!threadRes.ok) {
+        const errorText = await threadRes.text();  // <-- catch "Not Found"
+        console.error("Failed to fetch thread (raw):", errorText);
+        return res.status(500).send('Error fetching thread');
+        }
+
+        const threadData = await threadRes.json();
       if (!threadData.ok) {
         console.error("Failed to fetch thread:", threadData.error);
         return res.status(500).send('Error fetching thread');
