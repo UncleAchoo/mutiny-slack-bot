@@ -67,6 +67,10 @@ export default async function handler(req, res) {
         });
 
         if (!zdResponse.ok) {
+            console.log('zdResponse', zdResponse)
+            console.log('subdomain', ZENDESK_SUBDOMAIN)
+            console.log('email', ZENDESK_EMAIL)
+            console.log('api', ZENDESK_API_TOKEN)
           const errorText = await zdResponse.text();
           console.error("Zendesk fetch failed:", errorText);
           return res.status(500).send('Error fetching from Zendesk');
