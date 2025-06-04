@@ -56,6 +56,7 @@ export default async function handler(req, res) {
         });
 
         const data = await response.json();
+        console.log('data', data)
         return data.choices?.[0]?.message?.content || "Sorry, I couldn’t generate a helpful response.";
     } catch (err) {
         console.error("❌ AI query error:", err);
