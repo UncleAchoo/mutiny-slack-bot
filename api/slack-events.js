@@ -148,7 +148,7 @@ export default async function handler(req, res) {
       console.error('❌ Error handling Slack message:', err);
     }
      })();
-
+return
 
   }
 
