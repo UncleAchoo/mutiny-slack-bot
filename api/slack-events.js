@@ -59,7 +59,7 @@ export default async function handler(req, res) {
         return data.choices?.[0]?.message?.content || "Sorry, I couldn’t generate a helpful response.";
     } catch (err) {
         console.error("❌ AI query error:", err);
-        return "Sorry, something went wrong while generating an answer.";
+        return `Heya sorry, something went wrong while generating an answer. ${err}`;
     }
     };
 
