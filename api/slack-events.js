@@ -16,8 +16,12 @@ export default async function handler(req, res) {
   }
 
   if (type === 'event_callback' && event.type === 'app_mention') {
-    
+    res.status(200).send('Event received');
 
+    const channel = event.channel;
+    const ts = event.thread_ts || event.ts;
+
+    (async () => {
     // Helper: fetch Slack thread
     const fetchThread = async () => {
       try {
@@ -105,12 +109,9 @@ export default async function handler(req, res) {
       }
     };
 
-    res.status(200).send('Event received');
+    
 
-    const channel = event.channel;
-    const ts = event.thread_ts || event.ts;
-
-      (async () => {
+      
     // Execute steps
     try {
       const fullMessage = await fetchThread();
