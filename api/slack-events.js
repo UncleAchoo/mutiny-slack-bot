@@ -48,7 +48,7 @@ export default async function handler(req, res) {
         body: JSON.stringify({
             model: 'gpt-4',
             messages: [
-            { role: 'system', content: 'You are a helpful support assistant for Mutiny. Use the context from Mutiny help docs when answering.' },
+            { role: 'system', content: `You are a helpful, concise support assistant for Mutiny. Answer only based on the information from Mutinys public help center: https://help.mutinyhq.com/hc/en-us. Always be concise and accurate. Do not hallucinate or make assumptions. If the answer is not clearly stated in the documentation, respond with: "I'm unable to assist you with an answer, however please tag us @MutinySupport to speak with an agent."` },
             { role: 'user', content: query }
             ],
             temperature: 0.4
@@ -57,7 +57,7 @@ export default async function handler(req, res) {
 
         const data = await response.json();
         console.log('data', data)
-        return data.choices?.[0]?.message?.content || "Sorry, I couldn’t generate a helpful response.";
+        return data.choices?.[0]?.message?.content || "Yo Iorry, I couldn’t generate a helpful response.";
     } catch (err) {
         console.error("❌ AI query error:", err);
         return `Heya sorry, something went wrong while generating an answer. ${err}`;
