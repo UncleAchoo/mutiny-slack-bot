@@ -16,8 +16,7 @@ export default async function handler(req, res) {
   }
 
   if (type === 'event_callback' && event.type === 'app_mention') {
-    const channel = event.channel;
-    const ts = event.thread_ts || event.ts;
+    
 
     // Helper: fetch Slack thread
     const fetchThread = async () => {
@@ -48,7 +47,7 @@ export default async function handler(req, res) {
         body: JSON.stringify({
             model: 'gpt-4',
             messages: [
-            { role: 'system', content: "You are a concise, accurate support assistant for Mutiny. Answer only using content from https://help.mutinyhq.com/hc/en-us. If you cannot produce a help center link to support your response, reply: \"I’m not sure based on the help center. Please tag @MutinySupport to speak with an agent.\" Always include a direct help center link when possible."},
+            { role: 'system', content: "You are a concise, accurate support assistant for Mutiny. Answer only using context from https://help.mutinyhq.com/hc/en-us. If you are not 100% sure of your response, reply: \"I’m not sure based on the help center. Please tag @MutinySupport to speak with an agent.\" "},
             { role: 'user', content: query }
             ],
             temperature: 0.4
@@ -57,7 +56,7 @@ export default async function handler(req, res) {
 
         const data = await response.json();
         console.log('data', data)
-        return data.choices?.[0]?.message?.content || "Yo Iorry, I couldn’t generate a helpful response.";
+        return data.choices?.[0]?.message?.content || "Sorry, I couldn’t generate a helpful response.";
     } catch (err) {
         console.error("❌ AI query error:", err);
         return `Heya sorry, something went wrong while generating an answer. ${err}`;
@@ -106,6 +105,12 @@ export default async function handler(req, res) {
       }
     };
 
+    res.status(200).send('Event received');
+
+    const channel = event.channel;
+    const ts = event.thread_ts || event.ts;
+
+      (async () => {
     // Execute steps
     try {
       const fullMessage = await fetchThread();
@@ -139,11 +144,12 @@ export default async function handler(req, res) {
 
     
       await postToSlack(blocks);
-    } catch {
-      return res.status(500).send('Internal error occurred');
+    } catch(err) {
+      console.error('❌ Error handling Slack message:', err);
     }
+     })();
 
-    return res.status(200).send('Event received');
+
   }
 
   res.status(200).send('OK');
