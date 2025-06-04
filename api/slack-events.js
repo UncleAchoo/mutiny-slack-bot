@@ -136,7 +136,7 @@ export default async function handler(req, res) {
         }
       ]; 
 
-
+    
       await postToSlack(blocks);
     } catch {
       return res.status(500).send('Internal error occurred');
