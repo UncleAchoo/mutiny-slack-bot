@@ -16,10 +16,10 @@ export default async function handler(req, res) {
   }
 
   if (type === 'event_callback' && event.type === 'app_mention') {
-    res.status(200).send('Event received');
-
-    const channel = event.channel;
-    const ts = event.thread_ts || event.ts;
+      
+      const channel = event.channel;
+      const ts = event.thread_ts || event.ts;
+      res.status(200).send('Event received');
 
     (async () => {
     // Helper: fetch Slack thread
@@ -39,7 +39,7 @@ export default async function handler(req, res) {
       }
     };
 
-    // Helper: query Zendesk
+    // Helper: query AI
     const queryAI = async (query) => {
     try {
         const response = await fetch('https://api.openai.com/v1/chat/completions', {
