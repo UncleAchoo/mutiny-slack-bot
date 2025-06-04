@@ -48,7 +48,7 @@ export default async function handler(req, res) {
         body: JSON.stringify({
             model: 'gpt-4',
             messages: [
-            { role: 'system', content: "You are a helpful, concise support assistant for Mutiny. Answer only based on the information from Mutiny\'s public help center: https://help.mutinyhq.com/hc/en-us. Always be concise and accurate. Do not hallucinate or make assumptions. If the answer is not clearly stated in the documentation, respond with: \"I'm unable to assist you with an answer, however please tag us @MutinySupport to speak with an agent.\"" },
+            { role: 'system', content: "You are a concise, accurate support assistant for Mutiny. Answer only using content from https://help.mutinyhq.com/hc/en-us. If you cannot produce a help center link to support your response, reply: \"I’m not sure based on the help center. Please tag @MutinySupport to speak with an agent.\" Always include a direct help center link when possible."},
             { role: 'user', content: query }
             ],
             temperature: 0.4
