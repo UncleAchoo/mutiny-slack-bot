@@ -2,6 +2,7 @@ const SLACK_BOT_TOKEN = process.env.SLACK_BOT_TOKEN;
 const ZENDESK_EMAIL = process.env.ZENDESK_EMAIL;
 const ZENDESK_API_TOKEN = process.env.ZENDESK_API_TOKEN;
 const ZENDESK_SUBDOMAIN = "mutinyhq";
+const OPENAI_API_KEY = process.env.OPENAI_API_KEY;
 
 import fetch from 'node-fetch';
 
@@ -28,11 +29,40 @@ export default async function handler(req, res) {
         const data = JSON.parse(text);
         if (!data.ok) throw new Error(data.error);
         return data.messages.map(m => m.text).join('\n');
-      } catch (err) {
+      } 
+      catch (err) {
         console.error("❌ Slack thread fetch error:", err);
         throw new Error('Slack thread fetch failed');
       }
     };
+
+    // Helper: query Zendesk
+    const queryAI = async (query) => {
+    try {
+        const response = await fetch('https://api.openai.com/v1/chat/completions', {
+        method: 'POST',
+        headers: {
+            'Authorization': `Bearer ${process.env.OPENAI_API_KEY}`,
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+            model: 'gpt-4',
+            messages: [
+            { role: 'system', content: 'You are a helpful support assistant for Mutiny. Use the context from Mutiny help docs when answering.' },
+            { role: 'user', content: query }
+            ],
+            temperature: 0.4
+        })
+        });
+
+        const data = await response.json();
+        return data.choices?.[0]?.message?.content || "Sorry, I couldn’t generate a helpful response.";
+    } catch (err) {
+        console.error("❌ AI query error:", err);
+        return "Sorry, something went wrong while generating an answer.";
+    }
+    };
+
 
     // Helper: query Zendesk
     const queryZendesk = async (query) => {
@@ -78,25 +108,34 @@ export default async function handler(req, res) {
     // Execute steps
     try {
       const fullMessage = await fetchThread();
+      const aiAnswer = await queryAI(fullMessage);
       const articles = await queryZendesk(fullMessage);
 
       const blocks = [
         {
-          type: 'section',
-          text: { type: 'mrkdwn', text: `👋 Hi <@${event.user}>! I found a few help articles that might answer your question:` }
+            type: 'section',
+            text: { type: 'mrkdwn', text: `🤖 Here's an AI-generated answer based on your message:\n\n_${aiAnswer}_` }
+        },
+        {
+            type: 'divider'
+        },
+        {
+            type: 'section',
+            text: { type: 'mrkdwn', text: `📚 Also, here are a few help articles that might help:` }
         },
         ...articles.map(article => ({
-          type: 'section',
-          text: { type: 'mrkdwn', text: `• <${article.html_url}|${article.title}>` }
+            type: 'section',
+            text: { type: 'mrkdwn', text: `• <${article.html_url}|${article.title}>` }
         })),
         {
-          type: 'actions',
-          elements: [
+            type: 'actions',
+            elements: [
             { type: 'button', text: { type: 'plain_text', text: '✅ Helpful' }, value: 'helpful' },
             { type: 'button', text: { type: 'plain_text', text: '❌ Not Helpful' }, value: 'not_helpful' }
-          ]
+            ]
         }
-      ];
+      ]; 
+
 
       await postToSlack(blocks);
     } catch {
