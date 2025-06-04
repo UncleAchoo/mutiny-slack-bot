@@ -16,10 +16,6 @@ export default async function handler(req, res) {
   }
 
   if (type === 'event_callback' && event.type === 'app_mention') {
-    res.status(200).send('Event received'); // respond IMMEDIATELY to avoid retries
-
-     (async () => {
-    
     const channel = event.channel;
     const ts = event.thread_ts || event.ts;
 
@@ -55,7 +51,7 @@ export default async function handler(req, res) {
             { role: 'system', content: "You are a concise, accurate support assistant for Mutiny. Answer only using content from https://help.mutinyhq.com/hc/en-us. If you cannot produce a help center link to support your response, reply: \"I’m not sure based on the help center. Please tag @MutinySupport to speak with an agent.\" Always include a direct help center link when possible."},
             { role: 'user', content: query }
             ],
-            temperature: 0.3
+            temperature: 0.4
         })
         });
 
@@ -143,13 +139,12 @@ export default async function handler(req, res) {
 
     
       await postToSlack(blocks);
-    } catch (err) {
-        console.error("❌ Unexpected error in background task:", err);
+    } catch {
+      return res.status(500).send('Internal error occurred');
     }
-    })();
 
-
+    return res.status(200).send('Event received');
   }
 
-  return
+  res.status(200).send('OK');
 }
