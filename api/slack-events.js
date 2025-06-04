@@ -16,8 +16,10 @@ export default async function handler(req, res) {
   }
 
   if (type === 'event_callback' && event.type === 'app_mention') {
-    res.status(200).send('Event received'); // respond immediately to avoid Slack retries
+    res.status(200).send('Event received'); // respond IMMEDIATELY to avoid retries
 
+     (async () => {
+    
     const channel = event.channel;
     const ts = event.thread_ts || event.ts;
 
@@ -38,33 +40,34 @@ export default async function handler(req, res) {
       }
     };
 
-    // Helper: query OpenAI
+    // Helper: query Zendesk
     const queryAI = async (query) => {
-      try {
+    try {
         const response = await fetch('https://api.openai.com/v1/chat/completions', {
-          method: 'POST',
-          headers: {
-            'Authorization': `Bearer ${OPENAI_API_KEY}`,
+        method: 'POST',
+        headers: {
+            'Authorization': `Bearer ${process.env.OPENAI_API_KEY}`,
             'Content-Type': 'application/json'
-          },
-          body: JSON.stringify({
+        },
+        body: JSON.stringify({
             model: 'gpt-4',
             messages: [
-              { role: 'system', content: "You are a concise, accurate support assistant for Mutiny. Answer only using content from https://help.mutinyhq.com/hc/en-us. If you cannot produce a help center link to support your response, reply: \"I’m not sure based on the help center. Please tag @MutinySupport to speak with an agent.\" Always include a direct help center link when possible."},
-              { role: 'user', content: query }
+            { role: 'system', content: "You are a concise, accurate support assistant for Mutiny. Answer only using content from https://help.mutinyhq.com/hc/en-us. If you cannot produce a help center link to support your response, reply: \"I’m not sure based on the help center. Please tag @MutinySupport to speak with an agent.\" Always include a direct help center link when possible."},
+            { role: 'user', content: query }
             ],
-            temperature: 0.2
-          })
+            temperature: 0.3
+        })
         });
 
         const data = await response.json();
-        console.log('data', data);
-        return data.choices?.[0]?.message?.content || "Sorry, I couldn’t generate a helpful response.";
-      } catch (err) {
+        console.log('data', data)
+        return data.choices?.[0]?.message?.content || "Yo Iorry, I couldn’t generate a helpful response.";
+    } catch (err) {
         console.error("❌ AI query error:", err);
         return `Heya sorry, something went wrong while generating an answer. ${err}`;
-      }
+    }
     };
+
 
     // Helper: query Zendesk
     const queryZendesk = async (query) => {
@@ -107,43 +110,45 @@ export default async function handler(req, res) {
       }
     };
 
-    // Process everything asynchronously
-    (async () => {
-      try {
-        const fullMessage = await fetchThread();
-        const aiAnswer = await queryAI(fullMessage);
-        const articles = await queryZendesk(fullMessage);
+    // Execute steps
+    try {
+      const fullMessage = await fetchThread();
+      const aiAnswer = await queryAI(fullMessage);
+      const articles = await queryZendesk(fullMessage);
 
-        const blocks = [
-          {
+      const blocks = [
+        {
             type: 'section',
             text: { type: 'mrkdwn', text: `🤖 Here's an AI-generated answer based on your message:\n\n_${aiAnswer}_` }
-          },
-          { type: 'divider' },
-          {
+        },
+        {
+            type: 'divider'
+        },
+        {
             type: 'section',
             text: { type: 'mrkdwn', text: `📚 Also, here are a few help articles that might help:` }
-          },
-          ...articles.map(article => ({
+        },
+        ...articles.map(article => ({
             type: 'section',
             text: { type: 'mrkdwn', text: `• <${article.html_url}|${article.title}>` }
-          })),
-          {
+        })),
+        {
             type: 'actions',
             elements: [
-              { type: 'button', text: { type: 'plain_text', text: '✅ Helpful' }, value: 'helpful' },
-              { type: 'button', text: { type: 'plain_text', text: '❌ Not Helpful' }, value: 'not_helpful' }
+            { type: 'button', text: { type: 'plain_text', text: '✅ Helpful' }, value: 'helpful' },
+            { type: 'button', text: { type: 'plain_text', text: '❌ Not Helpful' }, value: 'not_helpful' }
             ]
-          }
-        ];
+        }
+      ]; 
 
-        await postToSlack(blocks);
-      } catch (err) {
-        console.error("❌ Error in async Slack task:", err);
-      }
+    
+      await postToSlack(blocks);
+    } catch {
+      return res.status(500).send('Internal error occurred');
+    }
     })();
 
-    return;
+
   }
 
   res.status(200).send('OK');
