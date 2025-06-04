@@ -148,10 +148,10 @@ export default async function handler(req, res) {
     } catch(err) {
       console.error('❌ Error handling Slack message:', err);
     }
-return
      })();
-
-  }
+     
+     }
+    return
 
 
 }
