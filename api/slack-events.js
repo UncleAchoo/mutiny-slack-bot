@@ -22,6 +22,7 @@ export default async function handler(req, res) {
     res.status(200).send('Event received');
 
     (async () => {
+        console.log('⚡️ Async task started for Slack event...');
         // Helper: fetch Slack thread
         const fetchThread = async () => {
         try {
