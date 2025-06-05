@@ -159,13 +159,13 @@ export default async function handler(req, res) {
         }
       ]; 
 
-    
-      await postToSlack(blocks);
       const botMessageExists = await checkBotMessageInThread(channel, ts);
       if (botMessageExists) {
         console.log('Bot has already responded in this thread, exit');
         return; // Exit without posting again
       }
+    
+      await postToSlack(blocks);
     } catch {
       return res.status(500).send('Internal error occurred');
     }
