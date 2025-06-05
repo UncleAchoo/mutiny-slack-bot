@@ -15,6 +15,7 @@ export default async function handler(req, res) {
     const channel = event.channel;
     const ts = event.thread_ts || event.ts;
     res.status(200).send('Event received');
+    (async () => {
     const fetchThread = async (channel, ts) => {
       try {
         console.log("Fetching thread with channel:", channel, "and ts:", ts);
@@ -118,7 +119,7 @@ export default async function handler(req, res) {
       }
     };
     // Main execution flow
-    (async () => {
+    
       try {
         console.log("Starting execution flow with channel:", channel, "and ts:", ts);
         const fullMessage = await fetchThread(channel, ts);
