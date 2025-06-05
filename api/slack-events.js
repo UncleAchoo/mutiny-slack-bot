@@ -34,6 +34,7 @@ export default async function handler(req, res) {
             const text = await response.text();
             const data = JSON.parse(text);
             if (!data.ok) throw new Error(data.error);
+            console.log("fetch thread ran", data)
             return data.messages.map(m => m.text).join('\n');
         } 
         catch (err) {
@@ -106,6 +107,7 @@ export default async function handler(req, res) {
             body: JSON.stringify({ channel, thread_ts: ts, blocks, text: "Here are some helpful articles" })
             });
             const data = await response.json();
+            console.log("console log after data fetch", data)
             if (!data.ok) console.error("❌ Slack message post failed:", data.error);
             return true
         } catch (err) {
