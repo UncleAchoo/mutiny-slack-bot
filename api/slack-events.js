@@ -27,6 +27,7 @@ export default async function handler(req, res) {
         console.log('⚡️ Async task started for Slack event...');
         // Helper: fetch Slack thread
 const fetchThread = async () => {
+    console.log("fetchThread before try/catch blocks")
   try {
     const response = await fetch(`https://slack.com/api/conversations.replies?channel=${channel}&ts=${ts}`, {
       headers: { 'Authorization': `Bearer ${SLACK_BOT_TOKEN}` }
@@ -37,7 +38,7 @@ const fetchThread = async () => {
     console.log("🧪 Slack fetch response:", data);
 
     if (!data.ok) {
-      console.error("🔴 Slack thread fetch failed with data:", data);
+      console.log("🔴 Slack thread fetch failed with data:", data);
       throw new Error(data.error);
     }
 
@@ -51,6 +52,7 @@ const fetchThread = async () => {
 
         // Helper: query AI
         const queryAI = async (query) => {
+                console.log("queryAI before try/catch blocks")
         try {
             const response = await fetch('https://api.openai.com/v1/chat/completions', {
             method: 'POST',
@@ -80,6 +82,7 @@ const fetchThread = async () => {
 
         // Helper: query Zendesk
         const queryZendesk = async (query) => {
+                console.log("queryZD before try/catch blocks")
         try {
             const url = `https://${ZENDESK_SUBDOMAIN}.zendesk.com/api/v2/help_center/articles/search.json?query=${encodeURIComponent(query)}`;
             const response = await fetch(url, {
@@ -103,6 +106,7 @@ const fetchThread = async () => {
 
         // Helper: post reply to Slack
         const postToSlack = async (blocks) => {
+                console.log("postToSlack before try/catch blocks")
         try {
             const response = await fetch('https://slack.com/api/chat.postMessage', {
             method: 'POST',
