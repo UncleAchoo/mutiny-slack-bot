@@ -23,7 +23,7 @@ export default async function handler(req, res) {
     const ts = event.thread_ts || event.ts;
     res.status(200).send('Event received');
     
- (async () => {
+
 
         // Helper: fetch Slack thread
     // const fetchThread = async () => {
@@ -72,34 +72,34 @@ export default async function handler(req, res) {
     // //     throw new Error('Slack thread fetch failed');
     // // }
     // };
-const fetchThread = async (channel, ts) => {
-  const url = `https://slack.com/api/conversations.replies?channel=${channel}&ts=${ts}`;
+    const fetchThread = async (channel, ts) => {
+    const url = `https://slack.com/api/conversations.replies?channel=${channel}&ts=${ts}`;
 
-  const res = await fetch(url, {
-    headers: { Authorization: `Bearer ${SLACK_BOT_TOKEN}` }
-  });
-  console.log('res', res)
+    const res = await fetch(url, {
+        headers: { Authorization: `Bearer ${SLACK_BOT_TOKEN}` }
+    });
+    console.log('res', res)
 
-  // 1.  HTTP-level error
-  if (!res.ok) {
-    throw new Error(`Network error ${res.status} while hitting Slack`);
-  }
+    // 1.  HTTP-level error
+    if (!res.ok) {
+        throw new Error(`Network error ${res.status} while hitting Slack`);
+    }
 
-  const data = await res.json();
-  console.log('data', data)
+    const data = await res.json();
+    console.log('data', data)
 
-  // 2.  Slack-level error
-  if (!data.ok) {
-    throw new Error(`Slack API error: ${data.error || 'unknown error'}`);
-  }
+    // 2.  Slack-level error
+    if (!data.ok) {
+        throw new Error(`Slack API error: ${data.error || 'unknown error'}`);
+    }
 
-  // 3.  Empty thread (rare but possible)
-  if (!Array.isArray(data.messages) || data.messages.length === 0) {
-    return '';                // …or decide if you’d rather throw here
-  }
+    // 3.  Empty thread (rare but possible)
+    if (!Array.isArray(data.messages) || data.messages.length === 0) {
+        return '';                // …or decide if you’d rather throw here
+    }
 
-  return data.messages.map(m => m.text ?? '').join('\n');
-};
+    return data.messages.map(m => m.text ?? '').join('\n');
+    };
 
 
 
@@ -181,7 +181,7 @@ const fetchThread = async (channel, ts) => {
 
     
 
-      
+       (async () => {
     // Execute steps
     try {
         console.log("try block of functions before functionsconsole log", channel, ts)
