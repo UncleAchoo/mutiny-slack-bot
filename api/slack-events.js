@@ -22,9 +22,9 @@ export default async function handler(req, res) {
     const channel = event.channel;
     const ts = event.thread_ts || event.ts;
     res.status(200).send('Event received');
-console.log("fetchThread try/catch blocks, channel, ts, and slack_bot_token", channel, ts)
+
     (async () => {
-    console.log('Async task started for Slack event');
+
         // Helper: fetch Slack thread
     const fetchThread = async () => {
   try {
@@ -36,7 +36,7 @@ console.log("fetchThread try/catch blocks, channel, ts, and slack_bot_token", ch
         'Content-Type': 'application/json',
       },
     });
-
+    console.log("🔢 Slack response status:", response.status);
     const text = await response.text();
     console.log(" Raw Slack response text:", text);
 
