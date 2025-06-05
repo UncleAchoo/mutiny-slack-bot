@@ -26,7 +26,7 @@ export default async function handler(req, res) {
     (async () => {
 
         // Helper: fetch Slack thread
-    const fetchThread = async () => {
+    const fetchThread = async (channel, ts) => {
     
         console.log("fetchThread function entered")
         return fetch(`https://slack.com/api/conversations.replies?channel=${channel}&ts=${ts}`, {
