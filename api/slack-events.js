@@ -49,10 +49,8 @@ export default async function handler(req, res) {
     //     console.log("❌ Slack thread fetch error:", err);
     //     throw new Error('Slack thread fetch failed');
     // }
-    /*
     console.log("fetchThread function entered")
-        console.log("fetchThread try block entered")
-        fetch(`https://slack.com/api/conversations.replies?channel=${channel}&ts=${ts}`, {
+        return fetch(`https://slack.com/api/conversations.replies?channel=${channel}&ts=${ts}`, {
             headers: { Authorization: `Bearer ${SLACK_BOT_TOKEN}` }
         }).then(response => {
             console.log("first then in fetch entered")
@@ -70,36 +68,7 @@ export default async function handler(req, res) {
   .catch(err => {
     console.log("❌ Fetch error in Slack request:", err);
   });
-}
-  */
 
-  console.log("fetchThread function entered");
-  try {
-    console.log("fetchThread try block entered");
-    return fetch(`https://slack.com/api/conversations.replies?channel=${channel}&ts=${ts}`, {
-      headers: { Authorization: `Bearer ${SLACK_BOT_TOKEN}` }
-    })
-      .then(response => {
-        console.log("first then in fetch entered");
-        if (!response.ok) {
-          console.log("Network response not okay");
-        }
-        return response.json();
-      })
-      .then(data => {
-        console.log("✅ Slack response:", data);
-        const combined = data.messages.map(m => m.text).join('\n');
-        console.log("🧾 Combined thread text:", combined);
-        return combined;
-      })
-      .catch(err => {
-        console.log("❌ Fetch error in Slack request:", err);
-        throw err;
-      });
-  } catch (err) {
-    console.log("❌ Top-level try/catch caught error:", err);
-    throw err;
-  }
 
     };
 
