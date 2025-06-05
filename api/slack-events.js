@@ -72,33 +72,31 @@ export default async function handler(req, res) {
     // //     throw new Error('Slack thread fetch failed');
     // // }
     // };
+const fetchThread = async (channel, ts) => {
+  const url = `https://slack.com/api/conversations.replies?channel=${channel}&ts=${ts}`;
 
-    const fetchThread = async () => {
-  try {
-    console.log("fetchThread function entered");
+  const res = await fetch(url, {
+    headers: { Authorization: `Bearer ${SLACK_BOT_TOKEN}` }
+  });
 
-    const response = await fetch(`https://slack.com/api/conversations.replies?channel=${channel}&ts=${ts}`, {
-      headers: { Authorization: `Bearer ${SLACK_BOT_TOKEN}` }
-    });
-
-    console.log("first then in fetch entered");
-
-    if (!response.ok) {
-      console.log("Network response not okay");
-      throw new Error("Slack returned non-ok response");
-    }
-
-    const data = await response.json();
-    console.log("✅ Slack response:", data);
-
-    const combined = data.messages.map(m => m.text).join('\n');
-    console.log("🧾 Combined thread text:", combined);
-    return combined;
-
-  } catch (err) {
-    console.log("❌ Fetch error in Slack request:", err);
-    throw err;
+  // 1.  HTTP-level error
+  if (!res.ok) {
+    throw new Error(`Network error ${res.status} while hitting Slack`);
   }
+
+  const data = await res.json();
+
+  // 2.  Slack-level error
+  if (!data.ok) {
+    throw new Error(`Slack API error: ${data.error || 'unknown error'}`);
+  }
+
+  // 3.  Empty thread (rare but possible)
+  if (!Array.isArray(data.messages) || data.messages.length === 0) {
+    return '';                // …or decide if you’d rather throw here
+  }
+
+  return data.messages.map(m => m.text ?? '').join('\n');
 };
 
 
@@ -184,8 +182,8 @@ export default async function handler(req, res) {
       
     // Execute steps
     try {
-        console.log("try block of functions before functionsconsole log")
-      const fullMessage = await fetchThread();
+        console.log("try block of functions before functionsconsole log", channel, ts)
+      const fullMessage = await fetchThread(channel, ts);
       console.log('📄 Fetched Slack thread message:', fullMessage);
       const aiAnswer = await queryAI(fullMessage);
       const articles = await queryZendesk(fullMessage);
