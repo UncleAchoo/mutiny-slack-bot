@@ -26,52 +26,81 @@ export default async function handler(req, res) {
 
 
         // Helper: fetch Slack thread
-    const fetchThread = async () => {
+    // const fetchThread = async () => {
     
-        console.log("fetchThread function entered")
-        return fetch(`https://slack.com/api/conversations.replies?channel=${channel}&ts=${ts}`, {
-            headers: { Authorization: `Bearer ${SLACK_BOT_TOKEN}` }
-        }).then(response => {
-            console.log("first then in fetch entered")
-            if (!response.ok) {
-                console.log("Network response not okay");
-            }
-        return response.json();
-        })
-        .then(data => {
-            console.log(data)
-            const combined = data.messages.map(m => m.text).join('\n');
-            console.log("🧾 Combined thread text:", combined);
-            return combined;
-        })
-        .catch(err => {
-            console.log("❌ Fetch error in Slack request:", err);
-        });
-
-    //     try {
-    //     console.log("fetchThread try/catch blocks, channel, ts, and slack_bot_token", channel, ts, SLACK_BOT_TOKEN)
-    //     const response = await fetch(`https://slack.com/api/conversations.replies?channel=${channel}&ts=${ts}`, {
-    //     headers: { 'Authorization': `Bearer ${SLACK_BOT_TOKEN}` }
+    //     console.log("fetchThread function entered")
+    //     return fetch(`https://slack.com/api/conversations.replies?channel=${channel}&ts=${ts}`, {
+    //         headers: { Authorization: `Bearer ${SLACK_BOT_TOKEN}` }
+    //     }).then(response => {
+    //         console.log("first then in fetch entered")
+    //         if (!response.ok) {
+    //             console.log("Network response not okay");
+    //         }
+    //     return response.json();
+    //     })
+    //     .then(data => {
+    //         console.log(data)
+    //         const combined = data.messages.map(m => m.text).join('\n');
+    //         console.log("🧾 Combined thread text:", combined);
+    //         return combined;
+    //     })
+    //     .catch(err => {
+    //         console.log("❌ Fetch error in Slack request:", err);
     //     });
 
+    // //     try {
+    // //     console.log("fetchThread try/catch blocks, channel, ts, and slack_bot_token", channel, ts, SLACK_BOT_TOKEN)
+    // //     const response = await fetch(`https://slack.com/api/conversations.replies?channel=${channel}&ts=${ts}`, {
+    // //     headers: { 'Authorization': `Bearer ${SLACK_BOT_TOKEN}` }
+    // //     });
+
         
-    //     const text = await response.text();
-    //     console.log("response from fetch thread?")
-    //     const data = JSON.parse(text);
+    // //     const text = await response.text();
+    // //     console.log("response from fetch thread?")
+    // //     const data = JSON.parse(text);
 
-    //     console.log("🧪 Slack fetch response:", data);
+    // //     console.log("🧪 Slack fetch response:", data);
 
-    //     if (!data.ok) {
-    //     console.log("🔴 Slack thread fetch failed with data:", data);
-    //     throw new Error(data.error);
-    //     }
+    // //     if (!data.ok) {
+    // //     console.log("🔴 Slack thread fetch failed with data:", data);
+    // //     throw new Error(data.error);
+    // //     }
 
-    //     return data.messages.map(m => m.text).join('\n');
-    // } catch (err) {
-    //     console.log("❌ Slack thread fetch error:", err);
-    //     throw new Error('Slack thread fetch failed');
-    // }
-    };
+    // //     return data.messages.map(m => m.text).join('\n');
+    // // } catch (err) {
+    // //     console.log("❌ Slack thread fetch error:", err);
+    // //     throw new Error('Slack thread fetch failed');
+    // // }
+    // };
+
+    const fetchThread = async () => {
+  try {
+    console.log("fetchThread function entered");
+
+    const response = await fetch(`https://slack.com/api/conversations.replies?channel=${channel}&ts=${ts}`, {
+      headers: { Authorization: `Bearer ${SLACK_BOT_TOKEN}` }
+    });
+
+    console.log("first then in fetch entered");
+
+    if (!response.ok) {
+      console.log("Network response not okay");
+      throw new Error("Slack returned non-ok response");
+    }
+
+    const data = await response.json();
+    console.log("✅ Slack response:", data);
+
+    const combined = data.messages.map(m => m.text).join('\n');
+    console.log("🧾 Combined thread text:", combined);
+    return combined;
+
+  } catch (err) {
+    console.log("❌ Fetch error in Slack request:", err);
+    throw err;
+  }
+};
+
 
 
         // Helper: query AI
