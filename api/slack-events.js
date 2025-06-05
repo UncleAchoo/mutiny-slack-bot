@@ -110,6 +110,7 @@ export default async function handler(req, res) {
             return true
         } catch (err) {
             console.error("❌ Error posting to Slack:", err);
+            throw err
         }
         };
 
@@ -119,6 +120,7 @@ export default async function handler(req, res) {
     // Execute steps
     try {
       const fullMessage = await fetchThread();
+      console.log('📄 Fetched Slack thread message:', fullMessage);
       const aiAnswer = await queryAI(fullMessage);
       const articles = await queryZendesk(fullMessage);
 
