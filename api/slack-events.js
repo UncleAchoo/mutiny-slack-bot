@@ -26,6 +26,27 @@ export default async function handler(req, res) {
 
         // Helper: fetch Slack thread
     const fetchThread = async () => {
+    
+        console.log("fetchThread function entered")
+        return fetch(`https://slack.com/api/conversations.replies?channel=${channel}&ts=${ts}`, {
+            headers: { Authorization: `Bearer ${SLACK_BOT_TOKEN}` }
+        }).then(response => {
+            console.log("first then in fetch entered")
+            if (!response.ok) {
+                console.log("Network response not okay");
+            }
+        return response.json();
+        })
+        .then(data => {
+            console.log(data)
+            const combined = data.messages.map(m => m.text).join('\n');
+            console.log("🧾 Combined thread text:", combined);
+            return combined;
+        })
+        .catch(err => {
+            console.log("❌ Fetch error in Slack request:", err);
+        });
+
     //     try {
     //     console.log("fetchThread try/catch blocks, channel, ts, and slack_bot_token", channel, ts, SLACK_BOT_TOKEN)
     //     const response = await fetch(`https://slack.com/api/conversations.replies?channel=${channel}&ts=${ts}`, {
@@ -49,27 +70,6 @@ export default async function handler(req, res) {
     //     console.log("❌ Slack thread fetch error:", err);
     //     throw new Error('Slack thread fetch failed');
     // }
-    console.log("fetchThread function entered")
-        fetch(`https://slack.com/api/conversations.replies?channel=${channel}&ts=${ts}`, {
-            headers: { Authorization: `Bearer ${SLACK_BOT_TOKEN}` }
-        }).then(response => {
-            console.log("first then in fetch entered")
-            if (!response.ok) {
-                console.log("Network response not okay");
-            }
-        return response.json();
-        })
-        .then(data => {
-            console.log(data)
-                const combined = data.messages.map(m => m.text).join('\n');
-                console.log("🧾 Combined thread text:", combined);
-                return combined;
-        })
-  .catch(err => {
-    console.log("❌ Fetch error in Slack request:", err);
-  });
-
-
     };
 
 
