@@ -49,10 +49,10 @@ export default async function handler(req, res) {
         body: JSON.stringify({
             model: 'gpt-4',
             messages: [
-            { role: 'system', content: "You are an accurate technical support specialist for MutinyHQ. Answer only using context from https://help.mutinyhq.com/hc/en-us. If you cannot answer the question from reading content in our help center, reply: \"I’m not sure based on the help center. Please tag @MutinySupport to speak with an agent.\" "},
+            { role: 'system', content: "You are an accurate technical support specialist for MutinyHQ. Answer only using context from https://help.mutinyhq.com/hc/en-us. If you cannot answer the question from reading content in our help center, reply: \"I’m not too sure, please tag @MutinySupport to speak with an agent.\" "},
             { role: 'user', content: query }
             ],
-            temperature: 0.9
+            temperature: 0.5
         })
         });
 
