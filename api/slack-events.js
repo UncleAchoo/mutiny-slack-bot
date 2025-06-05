@@ -120,8 +120,8 @@ export default async function handler(req, res) {
 
       
     // Execute steps
-    console.log("bottom of try blocks console log")
     try {
+            console.log("try block of functions before functionsconsole log")
       const fullMessage = await fetchThread();
       console.log('📄 Fetched Slack thread message:', fullMessage);
       const aiAnswer = await queryAI(fullMessage);
