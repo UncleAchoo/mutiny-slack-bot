@@ -106,9 +106,30 @@ export default async function handler(req, res) {
       }
     };
 
+    // Helper: Check if bot has already posted in this thread
+    async function checkBotMessageInThread(channel, ts) {
+    try {
+        const response = await fetch(`https://slack.com/api/conversations.replies?channel=${channel}&ts=${ts}`, {
+        headers: { 'Authorization': `Bearer ${SLACK_BOT_TOKEN}` }
+        });
+        const data = await response.json();
+        if (!data.ok) throw new Error(data.error);
+        return data.messages.some(message => message.user === botUserId);
+    } catch (err) {
+        console.error(":x: Error checking bot messages:", err);
+        return false; // If we can't check, assume no bot message exists
+    }
+    }
+
     // Execute steps
     try {
       const fullMessage = await fetchThread();
+
+      const botMessageExists = await checkBotMessageInThread(channel, ts);
+      if (botMessageExists) {
+        console.log('Bot has already responded in this thread, exit');
+        return; // Exit without posting again
+      }
       const aiAnswer = await queryAI(fullMessage);
       const articles = await queryZendesk(fullMessage);
 
