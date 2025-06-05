@@ -27,7 +27,7 @@ export default async function handler(req, res) {
         console.log('⚡️ Async task started for Slack event...');
         // Helper: fetch Slack thread
 const fetchThread = async () => {
-    console.log("fetchThread before try/catch blocks")
+    console.log("fetchThread before try/catch blocks", channel, ts)
   try {
     const response = await fetch(`https://slack.com/api/conversations.replies?channel=${channel}&ts=${ts}`, {
       headers: { 'Authorization': `Bearer ${SLACK_BOT_TOKEN}` }
@@ -44,7 +44,7 @@ const fetchThread = async () => {
 
     return data.messages.map(m => m.text).join('\n');
   } catch (err) {
-    console.error("❌ Slack thread fetch error:", err);
+    console.log("❌ Slack thread fetch error:", err);
     throw new Error('Slack thread fetch failed');
   }
 };
