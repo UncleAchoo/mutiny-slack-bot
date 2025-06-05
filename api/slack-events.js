@@ -50,21 +50,19 @@ export default async function handler(req, res) {
     //     throw new Error('Slack thread fetch failed');
     // }
     try {
-  fetch(`https://slack.com/api/conversations.replies?channel=${channel}&ts=${ts}`, {
-    headers: { Authorization: `Bearer ${SLACK_BOT_TOKEN}` }
-  })
-  .then(response => {
-    if (!response.ok) {
-      throw new Error("Network response not okay");
-    }
-    return response.json();
-  })
-  .then(data => {
-    console.log(data);
-    const text = data.text();
-    const theData = JSON.parse(text);
-    return theData.messages.map(m => m.text).join('\n');
-  })
+        fetch(`https://slack.com/api/conversations.replies?channel=${channel}&ts=${ts}`, {
+            headers: { Authorization: `Bearer ${SLACK_BOT_TOKEN}` }
+        }).then(response => {
+            if (!response.ok) {
+                throw new Error("Network response not okay");
+            }
+        return response.json();
+        })
+        .then(data => {
+                const combined = data.messages.map(m => m.text).join('\n');
+                console.log("🧾 Combined thread text:", combined);
+                return combined;
+        })
   .catch(err => {
     console.error("❌ Fetch error in Slack request:", err);
   });
