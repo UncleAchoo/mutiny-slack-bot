@@ -78,6 +78,7 @@ const fetchThread = async (channel, ts) => {
   const res = await fetch(url, {
     headers: { Authorization: `Bearer ${SLACK_BOT_TOKEN}` }
   });
+  console.log('res', res)
 
   // 1.  HTTP-level error
   if (!res.ok) {
@@ -85,6 +86,7 @@ const fetchThread = async (channel, ts) => {
   }
 
   const data = await res.json();
+  console.log('data', data)
 
   // 2.  Slack-level error
   if (!data.ok) {
