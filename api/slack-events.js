@@ -23,7 +23,7 @@ export default async function handler(req, res) {
     const ts = event.thread_ts || event.ts;
     res.status(200).send('Event received');
     
-
+ (async () => {
 
         // Helper: fetch Slack thread
     // const fetchThread = async () => {
@@ -222,6 +222,7 @@ console.log('working here?');
       console.error('❌ Error handling Slack message:', err);
     }
 
+     })();
      
     return
      }
