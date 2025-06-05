@@ -51,7 +51,6 @@ export default async function handler(req, res) {
     // }
     /*
     console.log("fetchThread function entered")
-    try {
         console.log("fetchThread try block entered")
         fetch(`https://slack.com/api/conversations.replies?channel=${channel}&ts=${ts}`, {
             headers: { Authorization: `Bearer ${SLACK_BOT_TOKEN}` }
@@ -71,38 +70,36 @@ export default async function handler(req, res) {
   .catch(err => {
     console.log("❌ Fetch error in Slack request:", err);
   });
-} catch (err) {
-  console.log("❌ Top-level try/catch caught error:", err);
 }
   */
 
   console.log("fetchThread function entered");
   try {
     console.log("fetchThread try block entered");
-    const response = await fetch(`https://slack.com/api/conversations.replies?channel=${channel}&ts=${ts}`, {
+    return fetch(`https://slack.com/api/conversations.replies?channel=${channel}&ts=${ts}`, {
       headers: { Authorization: `Bearer ${SLACK_BOT_TOKEN}` }
-    });
-
-    console.log("Slack response received");
-
-    if (!response.ok) {
-      console.log("Network response not okay");
-      throw new Error("Slack API responded with non-ok");
-    }
-
-    const data = await response.json();
-    console.log("✅ Slack response:", data);
-
-    const combined = data.messages.map(m => m.text).join('\n');
-    console.log("🧾 Combined thread text:", combined);
-
-    return combined;
+    })
+      .then(response => {
+        console.log("first then in fetch entered");
+        if (!response.ok) {
+          console.log("Network response not okay");
+        }
+        return response.json();
+      })
+      .then(data => {
+        console.log("✅ Slack response:", data);
+        const combined = data.messages.map(m => m.text).join('\n');
+        console.log("🧾 Combined thread text:", combined);
+        return combined;
+      })
+      .catch(err => {
+        console.log("❌ Fetch error in Slack request:", err);
+        throw err;
+      });
   } catch (err) {
-    console.log("❌ Error in fetchThread:", err);
+    console.log("❌ Top-level try/catch caught error:", err);
     throw err;
   }
-
-
 
     };
 
