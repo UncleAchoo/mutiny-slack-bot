@@ -110,12 +110,15 @@ export default async function handler(req, res) {
     // Helper: Check if bot has already posted in this thread
     async function checkBotMessageInThread(channel, ts) {
     try {
+        console.log('channel, ts inside message bot', channel, ts)
         const response = await fetch(`https://slack.com/api/conversations.replies?channel=${channel}&ts=${ts}`, {
         headers: { 'Authorization': `Bearer ${SLACK_BOT_TOKEN}` }
         });
         const data = await response.json();
         if (!data.ok) throw new Error(data.error);
+        console.log('bot message data', data)
         const botUserId = process.env.SLACK_BOT_USER_ID;
+        console.log('botuserid', botUserId)
         return data.messages.some(message => message.user === botUserId);
     } catch (err) {
         console.error(":x: Error checking bot messages:", err);
