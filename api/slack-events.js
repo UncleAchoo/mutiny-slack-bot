@@ -28,10 +28,11 @@ export default async function handler(req, res) {
         // Helper: fetch Slack thread
 const fetchThread = async () => {
     try {
-      console.log("fetchThread before try/catch blocks", channel, ts)
+      console.log("fetchThread before try/catch blocks, channel and ts", channel, ts)
     const response = await fetch(`https://slack.com/api/conversations.replies?channel=${channel}&ts=${ts}`, {
       headers: { 'Authorization': `Bearer ${SLACK_BOT_TOKEN}` }
     });
+    console.log("response from fetch thread")
     const text = await response.text();
     const data = JSON.parse(text);
 
