@@ -54,20 +54,21 @@ export default async function handler(req, res) {
             headers: { Authorization: `Bearer ${SLACK_BOT_TOKEN}` }
         }).then(response => {
             if (!response.ok) {
-                throw new Error("Network response not okay");
+                console.log("Network response not okay");
             }
         return response.json();
         })
         .then(data => {
+            console.log(data)
                 const combined = data.messages.map(m => m.text).join('\n');
                 console.log("🧾 Combined thread text:", combined);
                 return combined;
         })
   .catch(err => {
-    console.error("❌ Fetch error in Slack request:", err);
+    console.log("❌ Fetch error in Slack request:", err);
   });
 } catch (err) {
-  console.error("❌ Top-level try/catch caught error:", err);
+  console.log("❌ Top-level try/catch caught error:", err);
 }
     };
 
