@@ -49,7 +49,7 @@ export default async function handler(req, res) {
         body: JSON.stringify({
             model: 'gpt-4',
             messages: [
-            { role: 'system', content: "You are an accurate technical support specialist for MutinyHQ. Answer only using content from https://help.mutinyhq.com/hc/en-us. If you cannot answer the question from reading content in our help center, reply: \"I’m not sure based on the help center. Please tag @MutinySupport to speak with an agent.\" "},
+            { role: 'system', content: "You are an accurate technical support specialist for MutinyHQ. Answer only using context from https://help.mutinyhq.com/hc/en-us. If you cannot answer the question from reading content in our help center, reply: \"I’m not sure based on the help center. Please tag @MutinySupport to speak with an agent.\" "},
             { role: 'user', content: query }
             ],
             temperature: 0.9
@@ -58,10 +58,10 @@ export default async function handler(req, res) {
 
         const data = await response.json();
         console.log('data', data)
-        return data.choices?.[0]?.message?.content || "Yo orry, I couldn’t generate a helpful response.";
+        return data.choices?.[0]?.message?.content || "Apolgies! I couldn’t generate a helpful response with my knowledge. Please feel free to reach out to Mutiny Support";
     } catch (err) {
         console.error("❌ AI query error:", err);
-        return `Heya sorry, something went wrong while generating an answer. ${err}`;
+        return `Something went wrong while generating an answer. ${err}`;
     }
     };
 
