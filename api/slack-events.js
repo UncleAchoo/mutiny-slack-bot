@@ -22,51 +22,54 @@ export default async function handler(req, res) {
     const channel = event.channel;
     const ts = event.thread_ts || event.ts;
     res.status(200).send('Event received');
-
+console.log("fetchThread try/catch blocks, channel, ts, and slack_bot_token", channel, ts)
     (async () => {
 
         // Helper: fetch Slack thread
     const fetchThread = async () => {
-  try {
-    console.log("Calling Slack conversations.replies", channel, ts);
-    
-    const response = await fetch(`https://slack.com/api/conversations.replies?channel=${channel}&ts=${ts}`, {
-      headers: {
-        Authorization: `Bearer ${SLACK_BOT_TOKEN}`,
-        'Content-Type': 'application/json',
-      },
-    });
-    console.log("🔢 Slack response status:", response.status);
-    const text = await response.text();
-    console.log(" Raw Slack response text:", text);
+    //     try {
+    //     console.log("fetchThread try/catch blocks, channel, ts, and slack_bot_token", channel, ts, SLACK_BOT_TOKEN)
+    //     const response = await fetch(`https://slack.com/api/conversations.replies?channel=${channel}&ts=${ts}`, {
+    //     headers: { 'Authorization': `Bearer ${SLACK_BOT_TOKEN}` }
+    //     });
 
-    let data;
+        
+    //     const text = await response.text();
+    //     console.log("response from fetch thread?")
+    //     const data = JSON.parse(text);
+
+    //     console.log("🧪 Slack fetch response:", data);
+
+    //     if (!data.ok) {
+    //     console.log("🔴 Slack thread fetch failed with data:", data);
+    //     throw new Error(data.error);
+    //     }
+
+    //     return data.messages.map(m => m.text).join('\n');
+    // } catch (err) {
+    //     console.log("❌ Slack thread fetch error:", err);
+    //     throw new Error('Slack thread fetch failed');
+    // }
     try {
-      data = JSON.parse(text);
-    } catch (jsonErr) {
-      console.error(" Failed to parse Slack response as JSON", jsonErr);
-      throw new Error("Slack returned invalid JSON");
+  fetch(`https://slack.com/api/conversations.replies?channel=${channel}&ts=${ts}`, {
+    headers: { Authorization: `Bearer ${SLACK_BOT_TOKEN}` }
+  })
+  .then(response => {
+    if (!response.ok) {
+      throw new Error("Network response not okay");
     }
-
-    console.log("🧪 Parsed Slack response:", data);
-
-    if (!data.ok) {
-      console.error(" Slack API responded with error:", data.error);
-      throw new Error(data.error || "Slack API error");
-    }
-
-    if (!Array.isArray(data.messages)) {
-      console.error("Slack response missing 'messages' array:", data);
-      throw new Error("Slack response format invalid");
-    }
-
-    return data.messages.map((m) => m.text).join('\n');
-  } catch (err) {
-    console.error(" Slack thread fetch error:", err);
-    throw err;
-  }
-};
-
+    return response.json();
+  })
+  .then(data => {
+    console.log(data);
+  })
+  .catch(err => {
+    console.error("❌ Fetch error in Slack request:", err);
+  });
+} catch (err) {
+  console.error("❌ Top-level try/catch caught error:", err);
+}
+    };
 
 
         // Helper: query AI
