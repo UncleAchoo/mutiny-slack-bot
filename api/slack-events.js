@@ -51,6 +51,7 @@ async function processSlackEvent(channel, ts) {
       });
       const text = await response.text();
       const data = JSON.parse(text);
+      console.log('data', data)
       if (!data.ok) throw new Error(data.error);
       return data.messages.map(m => m.text).join('\n');
     } 
