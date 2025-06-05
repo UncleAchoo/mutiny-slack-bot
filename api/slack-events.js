@@ -120,6 +120,7 @@ export default async function handler(req, res) {
 
       
     // Execute steps
+    console.log("bottom of try blocks console log")
     try {
       const fullMessage = await fetchThread();
       console.log('📄 Fetched Slack thread message:', fullMessage);
