@@ -26,22 +26,28 @@ export default async function handler(req, res) {
     (async () => {
         console.log('⚡️ Async task started for Slack event...');
         // Helper: fetch Slack thread
-        const fetchThread = async () => {
-        try {
-            const response = await fetch(`https://slack.com/api/conversations.replies?channel=${channel}&ts=${ts}`, {
-            headers: { 'Authorization': `Bearer ${SLACK_BOT_TOKEN}` }
-            });
-            const text = await response.text();
-            const data = JSON.parse(text);
-            if (!data.ok) throw new Error(data.error);
-            console.log("fetch thread ran", data)
-            return data.messages.map(m => m.text).join('\n');
-        } 
-        catch (err) {
-            console.error("❌ Slack thread fetch error:", err);
-            throw new Error('Slack thread fetch failed');
-        }
-        };
+const fetchThread = async () => {
+  try {
+    const response = await fetch(`https://slack.com/api/conversations.replies?channel=${channel}&ts=${ts}`, {
+      headers: { 'Authorization': `Bearer ${SLACK_BOT_TOKEN}` }
+    });
+    const text = await response.text();
+    const data = JSON.parse(text);
+
+    console.log("🧪 Slack fetch response:", data);
+
+    if (!data.ok) {
+      console.error("🔴 Slack thread fetch failed with data:", data);
+      throw new Error(data.error);
+    }
+
+    return data.messages.map(m => m.text).join('\n');
+  } catch (err) {
+    console.error("❌ Slack thread fetch error:", err);
+    throw new Error('Slack thread fetch failed');
+  }
+};
+
 
         // Helper: query AI
         const queryAI = async (query) => {
@@ -121,7 +127,7 @@ export default async function handler(req, res) {
       
     // Execute steps
     try {
-            console.log("try block of functions before functionsconsole log")
+        console.log("try block of functions before functionsconsole log")
       const fullMessage = await fetchThread();
       console.log('📄 Fetched Slack thread message:', fullMessage);
       const aiAnswer = await queryAI(fullMessage);
