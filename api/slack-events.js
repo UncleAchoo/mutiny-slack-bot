@@ -107,6 +107,7 @@ export default async function handler(req, res) {
             });
             const data = await response.json();
             if (!data.ok) console.error("❌ Slack message post failed:", data.error);
+            return true
         } catch (err) {
             console.error("❌ Error posting to Slack:", err);
         }
