@@ -7,6 +7,8 @@ const OPENAI_API_KEY = process.env.OPENAI_API_KEY;
 import fetch from 'node-fetch';
 
 export default async function handler(req, res) {
+    console.log('📨 Slack handler triggered:', { type, eventType: event?.type });
+
   if (req.method !== 'POST') return res.status(405).send('Method Not Allowed');
 
   const { type, challenge, event } = req.body;
@@ -146,6 +148,7 @@ export default async function handler(req, res) {
 
     
       await postToSlack(blocks);
+      console.log('✅ Slack message posted (or attempted)');
     } catch(err) {
       console.error('❌ Error handling Slack message:', err);
     }
