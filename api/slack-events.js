@@ -4,6 +4,7 @@ const ZENDESK_API_TOKEN = process.env.ZENDESK_API_TOKEN;
 const ZENDESK_SUBDOMAIN = "mutinyhq";
 const OPENAI_API_KEY = process.env.OPENAI_API_KEY;
 
+
 import fetch from 'node-fetch';
 
 export default async function handler(req, res) {
@@ -114,6 +115,7 @@ export default async function handler(req, res) {
         });
         const data = await response.json();
         if (!data.ok) throw new Error(data.error);
+        const botUserId = process.env.SLACK_BOT_USER_ID;
         return data.messages.some(message => message.user === botUserId);
     } catch (err) {
         console.error(":x: Error checking bot messages:", err);
