@@ -61,6 +61,9 @@ export default async function handler(req, res) {
   })
   .then(data => {
     console.log(data);
+    const text = data.text();
+    const theData = JSON.parse(text);
+    return theData.messages.map(m => m.text).join('\n');
   })
   .catch(err => {
     console.error("❌ Fetch error in Slack request:", err);
