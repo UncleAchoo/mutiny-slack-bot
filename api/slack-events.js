@@ -7,6 +7,39 @@ const OPENAI_API_KEY = process.env.OPENAI_API_KEY;
 
 import fetch from 'node-fetch';
 
+
+const fetchZendeskTickets = async (limit = 100) => {
+  const authHeader = 'Basic ' + Buffer.from(`${ZENDESK_EMAIL}/token:${ZENDESK_API_TOKEN}`).toString('base64');
+  let url = `https://${ZENDESK_SUBDOMAIN}.zendesk.com/api/v2/tickets.json?page[size]=100`;
+  const allTickets = [];
+
+  while (url && allTickets.length < limit) {
+    const res = await fetch(url, { headers: { Authorization: authHeader } });
+    const data = await res.json();
+    allTickets.push(...data.tickets);
+    url = data.next_page;
+  }
+
+  // Optionally pull in comments per ticket
+  for (const ticket of allTickets.slice(0, limit)) {
+    try {
+      const commentRes = await fetch(`https://${ZENDESK_SUBDOMAIN}.zendesk.com/api/v2/tickets/${ticket.id}/comments.json`, {
+        headers: { Authorization: authHeader }
+      });
+      const commentData = await commentRes.json();
+      ticket.comments = commentData.comments.map(c => c.body).join('\n---\n');
+    } catch (err) {
+      console.error(`❌ Failed to fetch comments for ticket ${ticket.id}:`, err);
+      ticket.comments = '';
+    }
+  }
+
+  return allTickets.slice(0, limit);
+};
+
+
+
+
 export default async function handler(req, res) {
   if (req.method !== 'POST') return res.status(405).send('Method Not Allowed');
 
@@ -14,6 +47,18 @@ export default async function handler(req, res) {
 
   if (type === 'url_verification') {
     return res.status(200).json({ challenge });
+  }
+
+  if (event.text.includes('download tickets')) {
+    const tickets = await fetchZendeskTickets(100);
+    console.log("🎟️ Downloaded tickets:", tickets.length);
+    await postToSlack([
+        {
+        type: 'section',
+        text: { type: 'mrkdwn', text: `✅ Fetched *${tickets.length}* tickets from Zendesk.` }
+        }
+    ]);
+    return res.status(200).send('Ticket fetch completed');
   }
 
   if (type === 'event_callback' && event.type === 'app_mention') {
@@ -32,7 +77,6 @@ export default async function handler(req, res) {
         return data.messages.map(m => m.text).join('\n');
       } 
       catch (err) {
-        console.error("❌ Slack thread fetch error:", err);
         throw new Error('Slack thread fetch failed');
       }
     };
@@ -57,14 +101,11 @@ export default async function handler(req, res) {
         });
 
         const data = await response.json();
-        console.log('data', data)
         return data.choices?.[0]?.message?.content || "Apolgies! I couldn’t generate a helpful response with my knowledge. Please feel free to reach out to Mutiny Support";
     } catch (err) {
-        console.error("❌ AI query error:", err);
         return `Something went wrong while generating an answer. ${err}`;
     }
     };
-
 
     // Helper: query Zendesk
     const queryZendesk = async (query) => {
@@ -129,8 +170,6 @@ export default async function handler(req, res) {
     // Execute steps
     try {
       const fullMessage = await fetchThread();
-
-      
       const aiAnswer = await queryAI(fullMessage);
       const articles = await queryZendesk(fullMessage);
 
