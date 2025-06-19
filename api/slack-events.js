@@ -49,17 +49,7 @@ export default async function handler(req, res) {
     return res.status(200).json({ challenge });
   }
 
-  if (event.text.includes('download tickets')) {
-    const tickets = await fetchZendeskTickets(100);
-    console.log("🎟️ Downloaded tickets:", tickets.length);
-    await postToSlack([
-        {
-        type: 'section',
-        text: { type: 'mrkdwn', text: `✅ Fetched *${tickets.length}* tickets from Zendesk.` }
-        }
-    ]);
-    return res.status(200).send('Ticket fetch completed');
-  }
+  
 
   if (type === 'event_callback' && event.type === 'app_mention') {
     const channel = event.channel;
@@ -166,6 +156,18 @@ export default async function handler(req, res) {
         return false; // If we can't check, assume no bot message exists
     }
     }
+
+    if (event.text.includes('download tickets')) {
+    const tickets = await fetchZendeskTickets(100);
+    console.log("🎟️ Downloaded tickets:", tickets.length);
+    await postToSlack([
+        {
+        type: 'section',
+        text: { type: 'mrkdwn', text: `✅ Fetched *${tickets.length}* tickets from Zendesk.` }
+        }
+    ]);
+    return res.status(200).send('Ticket fetch completed');
+  }
 
     // Execute steps
     try {
