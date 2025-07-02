@@ -2,15 +2,7 @@
 
 import fetch from 'node-fetch';
 import fs from 'fs';
-import { fileURLToPath } from 'url';
-import { dirname } from 'path';
-
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = dirname(__filename);
-
 import dotenv from 'dotenv';
-dotenv.config({ path: path.resolve(__dirname, '../.env') });
-
 import { encode } from 'gpt-3-encoder'; // npm install gpt-3-encoder
 
 dotenv.config();
