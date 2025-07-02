@@ -6,10 +6,10 @@ import fetch from 'node-fetch';
 
 dotenv.config();
 
-const PINECONE_API_KEY = 'pcsk_4TGpfq_GUbfKBNPWTPfRr3a7V9Hepb7mqQJ8SPz2nyiXsw1NdRTMVX9wme6guHMGPM3PLh';
-const PINECONE_ENVIRONMENT = 'zendesk-embeddings-qwf2s6h.svc.aped-4627-b74a.pinecone.io';
-const PINECONE_INDEX = 'zendesk-embeddings';
-const OPENAI_API_KEY = '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';
+const PINECONE_API_KEY = process.env.PINECONE_API_KEY;
+const PINECONE_ENVIRONMENT = process.env.PINECONE_ENVIRONMENT;
+const PINECONE_INDEX = process.env.PINECONE_INDEX;
+const OPENAI_API_KEY = process.env.OPENAI_API_KEY;
 
 async function getQueryEmbedding(question) {
   const res = await fetch('https://api.openai.com/v1/embeddings', {
@@ -95,3 +95,6 @@ if (!question) {
   console.log("\n💬 Answer:\n");
   console.log(answer);
 })();
+
+
+// to ask it a question, run: node askZendeskAI.js "How do I fix a banner that isn't showing on mobile?"

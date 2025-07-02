@@ -8,9 +8,9 @@ import { encode } from 'gpt-3-encoder'; // npm install gpt-3-encoder
 dotenv.config();
 
 const ZENDESK_EMAIL = 'christine@mutinyhq.com';
-const ZENDESK_API_TOKEN = 'ePNGzVk1JS3Gkpqa3BFwvlQfyge126ESSR0GHqGE';
 const ZENDESK_SUBDOMAIN = "mutinyhq";
-const OPENAI_API_KEY = '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';
+const ZENDESK_API_TOKEN = process.env.ZENDESK_API_TOKEN;
+const OPENAI_API_KEY = process.env.OPENAI_API_KEY;
 console.log('ZENNNEMAIL', ZENDESK_EMAIL)
 console.log('ZENNNapi', ZENDESK_API_TOKEN)
 
