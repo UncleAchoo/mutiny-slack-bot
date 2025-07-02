@@ -1,6 +1,10 @@
 // askZendeskAI.js
 
 import dotenv from 'dotenv';
+import path from 'path';
+
+dotenv.config({ path: path.resolve(__dirname, '../.env') });
+
 import { Pinecone } from '@pinecone-database/pinecone';
 import fetch from 'node-fetch';
 
@@ -10,6 +14,7 @@ const PINECONE_API_KEY = process.env.PINECONE_API_KEY;
 const PINECONE_ENVIRONMENT = process.env.PINECONE_ENVIRONMENT;
 const PINECONE_INDEX = process.env.PINECONE_INDEX;
 const OPENAI_API_KEY = process.env.OPENAI_API_KEY;
+console.log('open', OPENAI_API_KEY)
 
 async function getQueryEmbedding(question) {
   const res = await fetch('https://api.openai.com/v1/embeddings', {

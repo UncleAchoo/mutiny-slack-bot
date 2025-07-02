@@ -3,6 +3,10 @@
 import fetch from 'node-fetch';
 import fs from 'fs';
 import dotenv from 'dotenv';
+import path from 'path';
+
+dotenv.config({ path: path.resolve(__dirname, '../.env') });
+
 import { encode } from 'gpt-3-encoder'; // npm install gpt-3-encoder
 
 dotenv.config();
